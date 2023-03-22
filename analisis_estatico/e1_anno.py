@@ -3,12 +3,10 @@
 import re
 
 texto = input().strip()
-patron1 = "^(\d{4})[\s]"
-patron2 = "[\s\.\,](\d{4})[\s\.\,]"
-results = re.findall(patron1, texto)
-results += re.findall(patron2, texto)
+patron2 = "(\D|^)(\d{4})(\D|$)"
+results = re.findall(patron2, texto,flags=re.M)
 
 
 for match in results:
-    print(match)
+    print(match[1])
 
