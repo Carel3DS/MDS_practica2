@@ -4,22 +4,24 @@
 • 2. Haz click sobre el proyecto para abrir la vista de detalle. Revisa las vulnerabilidades detectadas y la lista de Security Hotspots. ¿Qu´e diferencia crees que existe entre las vulnerabilidades y los Security Hotspots?
 -> Segun los detalles, se detectó 30 vulnerabilidades y 80 Security Hotspots. La diferencia entre estos dos es la necesidad de ser revisado manualmente para comprobar si realmente existe tal vulnerabilidad
 
-• 3. Haz cualquier commit para forzar un re-análisis (por ejemplo editando el README.md). ´
-Espera a que finalice y vuelve a Sonar. ¿Cuál es el estado del proyecto (Passed/Failed)?. ¿A qué
-crees que se debe? ¿Crees que el número de vulnerabilidades afecta a dicho veredicto?
-->
+• 3. Haz cualquier commit para forzar un re-análisis (por ejemplo editando el README.md). Espera a que finalice y vuelve a Sonar. ¿Cuál es el estado del proyecto (Passed/Failed)?. ¿A qué crees que se debe? ¿Crees que el número de vulnerabilidades afecta a dicho veredicto?
+-> Cuando se realiza el primer análisis sin configurar la definición de código, esta aparece como "Not computed". Por lo que al configurarlo como "la (comparación a la) versión previa" y forzar un re-análisis, esta aparece como Failed. Esto se debe a que hay 2 condiciones de seguridad que no se ha cumplido tras realizar el re-análisis: condición de fiabilidad (reliability) y de seguridad (security), con 19 bugs y 27 vulnerabilidades (22 de ellas catalogadas como "blocker" y 5 "critical")
 
 === MITIGACIÓN ===
-• 1. Elige una vulnerabilidad de tipo Blocker o Critical, explica cual es la vulnerabilidad detectada, ´
-por qué ha sido detectada (y si realmente es una vulnerabilidad y no un falso positivo).
+• 1. Elige una vulnerabilidad de tipo Blocker o Critical, explica cual es la vulnerabilidad detectada, por qué ha sido detectada (y si realmente es una vulnerabilidad y no un falso positivo).
+-> La primera vulnerabilidad que aparece en pantalla es de "Construcción de consultas SQL a partir de datos controlados por el usuario", que permitiría a priori un ataque SQLi. Se ha detectado como vulnerabilidad porque, según SonarCloud, en el método AttackResult login() se solicita un parámetro de tipo String llamado password_login. Esto sí que es una vulnerabilidad, pero vendría por el parámetro username_login, porque la consulta se construye de la siguiente manera:
+"SELECT (...) FROM (...) WHERE userid ='"+username_login+"'AND password = '"+ password_login+"'"
+Donde se aprecia que, si username_login empieza por "'" y termina con "#", un atacante podría realizar exitosamente una inyección SQL, dando como resultado una brecha de datos.
 
+• 2. Propón una solución e impleméntela en una nueva rama del repositorio. Explica los cambios que arreglan dicha vulnerabilidad.
+Una posible solución para esta vulnerabilidad sería utilizar métodos de consulta desinfectados, o consultar toda la tabla y recoger aquella que tenga el usuario y la contraseña, o en vez de usar métodos desinfectados se desinfecta la entrada eliminando cualquier caracter especial usado en SQL. En este caso, la clase PreparedStatement permite crear consultas desinfectados a través de parámetros no definidos (? en la consulta), que son luego definidos de forma segura con el método setString(). Por lo que sustituimos las variables en la consulta por interrogaciones y usamos setString para definir dichas interrogaciones:
+PreparedStatement statement =
+          connection.prepareStatement("select password from challenge_users where userid = ? and password = ?");
+      statement.setString(1, username_login);
+      statement.setString(2, password_login);
 
-• 2. Propón una solución e impleméntela en una nueva rama del repositorio. Explica los cambios
-que arreglan dicha vulnerabilidad.
+• 3. Crea una Pull Request de la nueva rama a la rama principal. ¿Qué opina Sonar de los cambios realizados?
+Al crear una Pull Request con el arreglo de la vulnerabilidad, Sonar opina que la ramificación está correcto , pero que el código nuevo no está revisado
 
-
-• 3. Crea una Pull Request de la nueva rama a la rama principal. ¿Qué opina Sonar de los
-cambios realizados?
-
-• 4. Junta (merge) la nueva rama con la rama principal. Una vez finalizado el análisis, ¿qué
-cambios se han producido en el proyecto? ¿Cuántas vulnerabilidades detecta ahora?
+• 4. Junta (merge) la nueva rama con la rama principal. Una vez finalizado el análisis, ¿qué cambios se han producido en el proyecto? ¿Cuántas vulnerabilidades detecta ahora?
+Al haber juntado las ramas, el número de vulnerabilidades se ha reducido a uno, detectando 26 vulnerabilidades
