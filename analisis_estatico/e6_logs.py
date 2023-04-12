@@ -1,10 +1,10 @@
 # Ejercicio 6: logs
-# https://regexr.com/7bg63
+# https://regexr.com/7bttm
 
 import re
 
 texto = input().strip()
-patron = r"(INFO) .*--- \[(.+)\].*?(\w+) : (.*)"
+patron = r"(INFO) .*--- \[(\w+)\].*?(\w+) *: (.*)"
 results = re.findall(patron, texto, flags=re.M)
 
 # Nota: devolverías el match entero, pero hay que imprimirlo de una forma específica
