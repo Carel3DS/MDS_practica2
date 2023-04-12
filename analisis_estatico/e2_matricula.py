@@ -1,4 +1,4 @@
-# Ejercicio 2: matricula
+# Ejercicio 2: matrícula
 import re
 
 texto = input().strip()

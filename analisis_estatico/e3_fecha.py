@@ -1,4 +1,4 @@
-# Ejercicio 2: fecha
+# Ejercicio 3: fecha
 import re
 
 texto = input().strip()

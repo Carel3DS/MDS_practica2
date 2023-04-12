@@ -1,4 +1,4 @@
-# Ejercicio 2: fecha
+# Ejercicio 4: correo
 import re
 
 texto = input().strip()
