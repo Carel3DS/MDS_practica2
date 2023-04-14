@@ -4,7 +4,7 @@
 import re
 
 texto = input().strip()
-patron = r"(INFO) .*--- \[(\w+)\].*?(\w+) *: (.*)"
+patron = r"(INFO|DEBUG|ERROR|WARNING) .*--- \[(\w+)\].*?(\w+)\s+: (.*)"
 results = re.findall(patron, texto, flags=re.M)
 
 # Nota: devolverías el match entero, pero hay que imprimirlo de una forma específica
